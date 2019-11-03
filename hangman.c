@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 void printHangman(int lives);
 void printTitle(char a[]);
@@ -7,6 +8,8 @@ char toCaps(char c);
 int isLetter(char c);
 int isIn(char str[], char c);
 void printLetters(char str[]);
+int randomize(unsigned int n);
+int countlines(char *filename);
 
 int main(){
     char keepPlaying = 'Y', letter;
@@ -15,20 +18,70 @@ int main(){
     char correctWord[200];
     char currentWord[200];
     char incorrectLetters[27];
-    int it;
+    int it;//"incorrectLetters" string iterator in the game
 
-    printTitle("HANGMAN BY ZABE");
+    FILE *words, *lineFile;
+    int line;
 
+    /*If "line" file doesn't exist, create one*/
+    lineFile = fopen("line","r+");
+    if(lineFile == NULL){
+        int n;
+        printf("I need a random number, please: ");
+        scanf("%d",n);
+        n = n % countlines("words.txt");
+        lineFile = fopen("line","w+");
+        fprintf(lineFile,"%d",n);
+    }
+    fclose(lineFile);
+
+    /*Check if "words.txt" exists*/
+    words = fopen("words.txt","r+");
+        if(words == NULL){
+            printf("Error: words.txt not found");
+            return 1;
+        }
+    fclose(words);
+    
+    
+    /*Game loop*/
     while(keepPlaying == 'Y' || keepPlaying == 'y'){
         lives = 6;
         win = 0;
         it = 0;
-        strcpy(correctWord,"CORNER");
+
+        /*Generate random number*/
+        lineFile = fopen("line","r+");
+        fscanf(lineFile,"%d",&line);
+        fclose(lineFile);
+        remove("line");
+        line = randomize(line)%countlines("words.txt");
+        lineFile = fopen("line","w+");
+        fprintf(lineFile,"%d",line);
+        fclose(lineFile);
+        
+        /*Get word from random number of line*/
+        words = fopen("words.txt","r+");
+        if(words == NULL){
+            printf("Error: words.txt not found");
+            return 1;
+        }
+        for(int i = 3; fgets(correctWord, 200, words) && i <= line; i++);
+            fgets(correctWord, 200, words);
+        fclose(words);
+        
+        /*Pass correct word to caps*/
+        for(int i = 0; i < 200; i++)
+            correctWord[i] = toCaps(correctWord[i]);
+
+        /*Prepare current word*/
         strcpy(currentWord,correctWord);
         for(int i = 0; currentWord[i] != '\0'; i++)
             currentWord[i] = '_';
         incorrectLetters[0] = '\0';
-
+        /*Title*/
+        printTitle("HANGMAN BY ZABE");
+        /*Game*/
         while(lives > 0 && !win){
             do{
                 printf("\nEnter a letter: ");
@@ -74,7 +127,7 @@ int main(){
             if(lives == 0)
                 win = 0;
         }
-        printf("\n");
+        system("@cls||clear");
         if(win)
             printTitle("You have won :D");
         else{
@@ -87,10 +140,12 @@ int main(){
             fflush(stdin);
             scanf("%c",&keepPlaying);
         }while(keepPlaying != 'y' && keepPlaying != 'Y'&& keepPlaying != 'n' && keepPlaying != 'N');
+        system("@cls||clear");
     }
-    printf("\n");
     printTitle("Thanks for playing! OwO");
-    
+    clock_t start_time = clock(); 
+    while (clock() < start_time + 1600);
+
     return 0;
 }
 
@@ -205,4 +260,27 @@ void printLetters(char str[]){
         printf("%c, ",str[i]);
     printf("%c%c",8,8);
     printf("%c",41);
+}
+int randomize(unsigned int n){
+    return (n^2)%n + 9*n - n/10;
+}
+int countlines(char *filename){
+    FILE *file;
+    int linesCount = 0;
+    char c;
+
+    file = fopen(filename,"r");
+    if(file == NULL){
+        printf("Error: %s not found",filename);
+        return 1;
+    }
+
+    for(; c != EOF ; c = fgetc(file))
+        if(c == '\n')
+            linesCount++;
+    linesCount++;
+
+    fclose(file);
+
+    return linesCount;
 }

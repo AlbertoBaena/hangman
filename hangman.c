@@ -51,14 +51,9 @@ int main(){
         it = 0;
 
         /*Generate random number*/
-        lineFile = fopen("line","r+");
-        fscanf(lineFile,"%d",&line);
-        fclose(lineFile);
-        remove("line");
-        line = randomize(line)%countlines("words.txt");
-        lineFile = fopen("line","w+");
-        fprintf(lineFile,"%d",line);
-        fclose(lineFile);
+        srand(time(NULL));
+        line = rand()%countlines("words.txt");
+        
         
         /*Get word from random number of line*/
         words = fopen("words.txt","r+");

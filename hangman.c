@@ -8,7 +8,6 @@ char toCaps(char c);
 int isLetter(char c);
 int isIn(char str[], char c);
 void printLetters(char str[]);
-int randomize(unsigned int n);
 int countlines(char *filename);
 
 int main(){
@@ -22,18 +21,6 @@ int main(){
 
     FILE *words, *lineFile;
     int line;
-
-    /*If "line" file doesn't exist, create one*/
-    lineFile = fopen("line","r+");
-    if(lineFile == NULL){
-        int n;
-        printf("I need a random number, please: ");
-        scanf("%d",n);
-        n = n % countlines("words.txt");
-        lineFile = fopen("line","w+");
-        fprintf(lineFile,"%d",n);
-    }
-    fclose(lineFile);
 
     /*Check if "words.txt" exists*/
     words = fopen("words.txt","r+");
@@ -260,9 +247,6 @@ void printLetters(char str[]){
         printf("%c, ",str[i]);
     printf("%c%c",8,8);
     printf("%c",41);
-}
-int randomize(unsigned int n){
-    return (n^2)%n + 9*n - n/10;
 }
 int countlines(char *filename){
     FILE *file;

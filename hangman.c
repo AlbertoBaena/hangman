@@ -43,7 +43,10 @@ int main(){
         }
     fclose(words);
     
-    
+    /*Initiate randomizer*/
+    srand(time(NULL));
+
+
     /*Game loop*/
     while(keepPlaying == 'Y' || keepPlaying == 'y'){
         lives = 6;
@@ -51,7 +54,7 @@ int main(){
         it = 0;
 
         /*Generate random number*/
-        srand(time(NULL));
+        
         line = rand()%countlines("words.txt");
         
         
@@ -74,10 +77,17 @@ int main(){
         for(int i = 0; currentWord[i] != '\0'; i++)
             currentWord[i] = '_';
         incorrectLetters[0] = '\0';
-        /*Title*/
-        printTitle("HANGMAN BY ZABE");
+        
         /*Game*/
         while(lives > 0 && !win){
+            printTitle("HANGMAN BY ZABE");
+            printf("\n\nWord: %s\n",currentWord);
+            printHangman(lives);
+            printf("\nIncorrect letters: ");
+            if(incorrectLetters[0] != '\0')
+                printLetters(incorrectLetters);
+            else
+                printf("none.");
             do{
                 printf("\nEnter a letter: ");
                 fflush(stdin);
@@ -110,17 +120,12 @@ int main(){
                     printf("\nAlso, you had tried this letter earlier.");
                 lives--;
             }
-            printf("\n\nWord: %s\n",currentWord);
-            printHangman(lives);
-            printf("\nIncorrect letters: ");
-            if(incorrectLetters[0] != '\0')
-                printLetters(incorrectLetters);
-            else
-                printf("none.");
+            
             if(strcmp(currentWord,correctWord)==0)
                 win = 1;
             if(lives == 0)
                 win = 0;
+            system("@cls||clear");
         }
         system("@cls||clear");
         if(win)
